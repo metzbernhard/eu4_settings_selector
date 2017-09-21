@@ -25,3 +25,9 @@ Video-Introduction: https://www.youtube.com/watch?v=wZHHEEHBGk0
   - You can put the scripts (settings_db.py & settings_selector.py) whereever you want
   - The program will generate three files (settings.db, path.txt, playpath.txt) which it uses to save data, if you move the scripts, move these files too. Other than that it's completely portable. 
   - If you use the program, please subcsribe the [Steam Workshop Mod](http://steamcommunity.com/sharedfiles/filedetails/?id=1135450490) for the Tool, which I'd like to use to keep track of amount of users and as a plattform for feedback! 
+
+# Changelog #1
+  - Added How to Use Button with instructional information
+  - Merged Scrape & Save Button
+  - Tool checks for and prevents name duplicates
+  - Selects latest entry after saving or deleting settings
