@@ -25,6 +25,22 @@ class Selector:
         self.window.protocol("WM_DELETE_WINDOW", self._close)
         # for closing the db, see self._close function
 
+        self.helptext = '''Create new settings:
+1) Set the path to settings.txt and (optional) the path to Steam
+2) Start the EU4 Launcher and set the settings you want to save
+3) Either close the Launcher or start the game 
+(otherwise the settings.txt won't be saved)
+4) Enter a Name for your settings and click the button to save
+        
+Start the game using settings:
+1) Select the settings you want to use in the dropdown menu
+2) Click "Use"
+3) Either start EU4 via Steam or the "Play"-Button
+        
+Delete settings:
+1) Select the settings you want to delete in the dropdown menu
+2) Click Delete'''
+
         self.dlc = []
         self.mod = []
 
@@ -37,8 +53,14 @@ class Selector:
         self.frame_header.grid(row=1, column=0)
         self.logo = PhotoImage(file='eu4.gif')
 
-        ttk.Label(self.frame_header, image=self.logo).grid(column=0, row=0)
+        ttk.Label(self.frame_header, image=self.logo).grid(column=0, row=0, rowspan=2)
         self.header = ttk.Label(self.frame_header, text='EU4 Settings\nSelector', font=('Arial', 22, 'bold'), justify=CENTER).grid(row=0, column=1)
+
+        # help
+        self.helpframe = ttk.Frame(self.frame_header)
+        self.helpframe.grid(row=1, column=1)
+        self.help = ttk.Button(self.helpframe, text="How to use this tool", command=lambda: self.helpmessage())
+        self.help.pack()
 
         ttk.Separator(self.window, orient=HORIZONTAL).grid(row=2, column=0, sticky="ew", pady=10)
         #give me your path
@@ -50,11 +72,11 @@ class Selector:
         self.frame_pathentry.insert(0, self.path)
 
         # set path
-        self.frame_pathset = ttk.Button(self.frame_path, text='Set Path', command=lambda: self.set_directory('path.txt'))
-        self.frame_pathset.grid(row=1, column=1, sticky="e")
+        # self.frame_pathset = ttk.Button(self.frame_path, text='Set Path', command=lambda: self.set_directory('path.txt'))
+        # self.frame_pathset.grid(row=1, column=1, sticky="e")
 
         # select path
-        self.frame_pathbutton = ttk.Button(self.frame_path, text='Select Path...', command=lambda: self.getdirectory())
+        self.frame_pathbutton = ttk.Button(self.frame_path, text='Select Path containing settings.txt...', command=lambda: self.getdirectory())
         self.frame_pathbutton.grid(row=1, column=0, sticky="w")
 
         ttk.Separator(self.window, orient=HORIZONTAL).grid(row=4, column=0, sticky="ew", pady=10)
@@ -67,12 +89,12 @@ class Selector:
         self.frame_name_entry.grid(row=0, column=0, columnspan=2)
 
         # parsing settings.txt
-        self.frame_setting = ttk.Button(self.frame_name, text='Read Current Settings', command=lambda: self.scrape())
+        self.frame_setting = ttk.Button(self.frame_name, text='Scrape and Save Current Settings', command=lambda: self.scrape())
         self.frame_setting.grid(row=1, column=0, sticky="w")
 
         # using settings.txt
-        self.frame_setting = ttk.Button(self.frame_name, text='Save Scraped Settings', command=lambda: self.save_scrape())
-        self.frame_setting.grid(row=1, column=1, sticky="e")
+        # self.frame_setting = ttk.Button(self.frame_name, text='Save Scraped Settings', command=lambda: self.save_scrape())
+        # self.frame_setting.grid(row=1, column=1, sticky="e")
 
         ttk.Separator(self.window, orient=HORIZONTAL).grid(row=6, column=0, sticky="ew", pady=10)
 
@@ -106,11 +128,21 @@ class Selector:
         self.play_button = ttk.Button(self.frame_play, text="Play", width=20, command=lambda: self.start())
         self.play_button.grid(row=1, column=0, sticky='w')
 
-        self.play_setpath = ttk.Button(self.frame_play, text="Set Steam Path", width=20, command=lambda: self.getplaydirectory())
+        self.play_setpath = ttk.Button(self.frame_play, text="Set Steam Path...", width=20, command=lambda: self.getplaydirectory())
         self.play_setpath.grid(row=1, column=1, sticky='e')
 
 
     def scrape(self):
+        set_name = self.frame_name_entry.get()
+        # check if name is entered:
+        if len(set_name) == 0:
+            messagebox.showinfo(title="No Name", message="Please enter name for settings")
+            return
+        # print (self.database.check(set_name))
+        # check if name is in use:
+        if self.database.check(set_name):
+            messagebox.showinfo(title="Duplicate", message="Name is already used for settings. Either Delete Set to create a new one under this name or choose a different name")
+            return
         workpath = os.getcwd()
         os.chdir(self.path)
         # print(os.getcwd())
@@ -142,17 +174,14 @@ class Selector:
                 self.dlc.append(line[6:-2])
             elif '.mod' in line:
                 self.mod.append(line[6:-2])
-        messagebox.showinfo(title="Done", message="""Scraped Settings, press 'Save Scraped Settings' Button 
-to save the set of settings as new entry with the given Name!""")
+        self.database.new(name=set_name, lang=self.lang, rx=self.x, ry=self.y, fs=self.fs, bl=self.bl, mods=self.mod,
+                          dlc=self.dlc)
+        self.populate_selectionbox()
+        messagebox.showinfo(title="Done", message="Saved Current settings.txt under " + set_name)
         os.chdir(workpath)
 
-    def save_scrape(self):
-        set_name = self.frame_name_entry.get()
-        if len(set_name) == 0:
-            messagebox.showinfo(title="No Name", message="Please enter name for settings")
-        else:
-            self.database.new(name=set_name, lang=self.lang, rx=self.x, ry=self.y, fs=self.fs, bl=self.bl, mods=self.mod, dlc=self.dlc)
-        self.populate_selectionbox()
+    def helpmessage(self):
+        messagebox.showinfo(title="How to use", message=self.helptext)
 
     def set_path(self):
         if os.path.exists('path.txt'):
@@ -160,7 +189,6 @@ to save the set of settings as new entry with the given Name!""")
                 return f.read()
         else:
             with open ('path.txt', 'w') as f:
-                print('why')
                 f.write('C:\\Users\\YOURUSERNAME\\Documents\\Paradox Interactive\\Europa Universalis IV')
                 return 'C:\\Users\\YOURUSERNAME\\Documents\\Paradox Interactive\\Europa Universalis IV'
 
@@ -189,18 +217,22 @@ to save the set of settings as new entry with the given Name!""")
         self.path = filedialog.askdirectory()
         self.frame_pathentry.delete(0, END)
         self.frame_pathentry.insert(0, self.path)
+        with open('path.txt', 'w') as f:
+            f.write(self.path)
 
     def getplaydirectory(self):
         self.playpath = filedialog.askdirectory()
         self.playentry.delete(0, END)
         self.playentry.insert(0, self.playpath)
-        self.set_directory('playpath.txt')
+        with open('playpath.txt', 'w') as f:
+            f.write(self.playpath)
 
     def populate_selectionbox(self):
         names = []
         for row in self.database:
             names.append(row['name'])
         self.selectionbox.config(values=names)
+        self.selectionbox.set(names[-1])
 
     def write_settings(self):
         data = self.database.get(self.selectionbox.get())
@@ -256,18 +288,6 @@ to save the set of settings as new entry with the given Name!""")
         elif int==1:
             return 'yes'
 
-    def set_directory(self, file):
-        self.path = self.frame_pathentry.get()
-        with open(file, 'w') as f:
-            f.write(self.path)
-        # print(self.path)
-
-    def set_directory(self, file):
-        self.playpath = self.playentry.get()
-        with open(file, 'w') as f:
-            f.write(self.playpath)
-        # print(self.path)
-
     def delete_settings(self):
         self.database.delete(self.selectionbox.get())
         self.populate_selectionbox()
@@ -276,21 +296,6 @@ def number_re(text):
 	find = re.search('[0-9]+', text)
 	if find:
 		return find.group()
-
-def modlist(mods, path, tree):
-    #get a list of modfiles
-    for file in os.listdir(path + '\\mod'):
-        if file.endswith(('.mod')):
-            with open(path + '\\mod\\' + file) as f:
-                name = f.readline()
-                name = name[6:-2]
-                mods.append(name)
-    #populate the tkinter-modtree
-    i=1
-    for mod in mods:
-        #List the mods in teeview
-        tree.insert('', i, 'mod'+str(i), text=mod)
-        i=i+1
 
 ###############################################################################################
 

@@ -22,13 +22,25 @@ class db:
             elif isinstance(value, list):
                 # print(value)
                 settings += "'" + ','.join(value) + "',"
-        settings = settings[:-1]
+        # print(settings)
+        if settings[-1] == ' ':
+            settings = settings[:-2]
+        elif settings[-1] == ',':
+            settings = settings[:-1]
         # there is more elegant ways of doing this ...
         # inserting a new set of settings into our db
         insert = ('insert into settings (name,lang,rx,ry,fs,bl,mods,dlc) values (' + settings + ')')
         # print (insert)
         self.db.execute(insert)
         self.db.commit()
+
+    def check(self, name):
+        cursor = self.db.execute('select name from settings where name = ?', (name,))
+        list = cursor.fetchall()
+        if not list:
+            return False
+        else:
+            return True
 
     def delete(self, name):
         # find setting after name and delete!
@@ -61,8 +73,8 @@ def main():
     test = db()
 
     print('Create rows')
-    test.new(name = 'name', lang = 'german', rx = 1920, ry = 1080, fs = 0, bl = 1, mods = '', dlc = '')
-    test.new(name = 'really', lang = 'english', rx = 1920, ry = 1080, fs = 0, bl = 1, mods = '', dlc = '')
+    test.new(name='name', lang='german', rx=1920, ry=1080, fs=0, bl=1, mods='', dlc='')
+    test.new(name='really', lang='english', rx=1920, ry=1080, fs=0, bl=1, mods='', dlc='')
     for row in test:
         print(row)
 
