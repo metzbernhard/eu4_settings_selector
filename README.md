@@ -2,7 +2,7 @@
 
 Little Python Tool for Europa Universalis 4 to quickly change between sets of settings, without having to manually (de)select DLCs,Mods or other settings. 
 
-(https://puu.sh/xF8xK/a86534d421.png)
+[(https://puu.sh/xF8xK/a86534d421.png)]
 
 # How to use:
   - Start the program using settings_selector.py (Python 3 needs to be installed, https://python.org)
