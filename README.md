@@ -5,7 +5,8 @@ Little Python Tool for Europa Universalis 4 to quickly change between sets of se
 ![Image](https://puu.sh/xF8xK/a86534d421.png "Selector")
 
 # How to use:
-  - Start the program using settings_selector.py (Python 3 needs to be installed, https://python.org)
+  - Start the program using settings_selector.py (Python 3 needs to be installed, https://python.org) or
+    using the .exe in the dist folder, this should not need Python to be installed)
   - Set Path to settings.txt (default: Documents/Paradox Interactive/Europa Universalis 4)
   - Select a name for the current settings you use in EU4 and click "Read Current Settings"
   - If you click "Save Scraped Settings" the current settings will be available under the chosen name in the Selector
