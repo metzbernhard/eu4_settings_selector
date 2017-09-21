@@ -51,14 +51,14 @@ Delete settings:
         # HEADER
         self.frame_header = ttk.Frame(self.window)
         self.frame_header.grid(row=1, column=0)
-        self.logo = PhotoImage(file='eu4.gif')
+        # self.logo = PhotoImage(file='eu4.gif')
 
-        ttk.Label(self.frame_header, image=self.logo).grid(column=0, row=0, rowspan=2)
-        self.header = ttk.Label(self.frame_header, text='EU4 Settings\nSelector', font=('Arial', 22, 'bold'), justify=CENTER).grid(row=0, column=1)
+        # ttk.Label(self.frame_header, image=self.logo).grid(column=0, row=0, rowspan=2)
+        self.header = ttk.Label(self.frame_header, text='Europa Universalis IV\nSettings Selector', font=('Arial', 20, 'bold'), justify=CENTER).grid(row=0, column=0)
 
         # help
-        self.helpframe = ttk.Frame(self.frame_header)
-        self.helpframe.grid(row=1, column=1)
+        self.helpframe = ttk.Frame(self.frame_header, padding=(5,5))
+        self.helpframe.grid(row=1, column=0)
         self.help = ttk.Button(self.helpframe, text="How to use this tool", command=lambda: self.helpmessage())
         self.help.pack()
 
@@ -232,7 +232,8 @@ Delete settings:
         for row in self.database:
             names.append(row['name'])
         self.selectionbox.config(values=names)
-        self.selectionbox.set(names[-1])
+        if names:
+            self.selectionbox.set(names[-1])
 
     def write_settings(self):
         data = self.database.get(self.selectionbox.get())
