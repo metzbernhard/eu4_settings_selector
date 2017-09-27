@@ -1,4 +1,4 @@
-# EU4 Settings Selector
+# See https://github.com/metzbernhard/pdx_settings_selector for continued development! 
 
 Little Python Tool for Europa Universalis 4 to quickly change between sets of settings, without having to manually (de)select DLCs,Mods or other settings. 
 
